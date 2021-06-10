@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://localhost:4000/RelationalDataSelection_demo/stylesheets/stylesheet.css">
+  <link rel="canonical" href="http://localhost:4000/RelationalDataSelection_demo/">
+  <link rel="stylesheet" href="http://localhost:4000/RelationalDataSelection_demo/stylesheets/sharing-popup.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <link rel="alternate" type="application/rss+xml" title="Relational Data Selection" href="http://localhost:4000/RelationalDataSelection_demo/feed.xml">
+  <meta name="description" content="">
+
+   <title>Relational Data Selection</title>
+
+
+
+</head>
+
+
+  <body>
+
+    <header class="page-header">
+     <h1 class="project-name"> <a class="header-link" href="/RelationalDataSelection_demo/"> Relational Data Selection</a></h1>
+     <!--<h3 style="font-weight: lighter;">a blog for <a class="header-link" href="http://canijustgo.com/" target="_blank">canijustgo.com</a></h3>-->
+     <h3>
+</header>
+
+
+    <section class="main-content">
+      <div class="wrapper">
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<script type="text/javascript" async="" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js">
+</script>
+
+<p>This page is the demo of 
+“Relational Data Selection for Data Augmentation of Speaker-dependent Multi-band MelGAN Vocoder” [<a href="https://arxiv.org/abs/2007.12955">paper</a>]</p>
+
+<h2 id="abstract"><strong>Abstract</strong></h2>
+<p align="justify"> In this paper, we propose a data augmentation method based on speaker representation and similarity measurement of speaker verification. The proposed method (<b>DC1-3</b>) selects utterances that have similar speaker identity to the target speaker from an external corpus, and then combines the selected utterances with the limited target data for speaker-dependent (SD) vocoder adaptation. Compared with the vocoder adapted using only limited target data, the vocoder adapted using augmented data improves both the quality and similarity of synthesized speech. </p>
+
+<p><strong>Corpus and references:</strong><br />
+<a href="http://challenge.ai.iqiyi.com/detail?raceId=5fb2687724954e0b48431fdf">M2VoC in ICASSP2021</a><br />
+<a href="https://arxiv.org/abs/1910.06711">MelGAN</a><br />
+<a href="https://github.com/kan-bayashi/ParallelWaveGAN">MelGAN_repo</a></p>
+
+<h2 id="dc1-speaker-similarity"><strong>DC1</strong>: Speaker similarity</h2>
+<p align="justify"> To Select external utterances with similar speaker identities to the target speaker for speaker adaptation, we adopt <b>x-vector</b> speaker representation for identity modeling and the probabilistic linear discriminant analysis (<b>PLDA</b>) for similarity measurement. The <b>DC1</b> criterion is formulated as
+<br />
+$$ \mathrm{PLDA}(\boldsymbol{x}_{n, i},\boldsymbol{x}_{Target}), $$
+<br />
+where $\boldsymbol{x}$ denotes x-vector, $n$ is the candidate speaker index, $i$ is the utterance index, and $\boldsymbol{x}_{Target}$ is the average x-vector of all target utterances. The higher the PLDA score, the higher the speaker similarity. Furthermore, to make all PLDA scores have the same sign for the following criterion, temperature sigmoid is applied as
+<br />
+$$ \mathrm{PLDA}'(\cdot) = \frac{1}{1+0.5\times e^{-\mathrm{PLDA}(\cdot)}}. $$ <br />
+</p>
+
+<h2 id="dc2-dc1--speaker-wise-divergence-regularization"><strong>DC2</strong>: DC1 + Speaker-wise divergence regularization</h2>
+<p align="justify"> To regularize the utterance-wise x-vectors from the same speaker should be similar, an SD term is introduced to DC1, and the new <b>DC2</b> criterion is formulated as 
+<br />
+$$ \frac{\mathrm{PLDA}'(\boldsymbol{x}_{n, i},\boldsymbol{x}_{Target})}{(\sigma_n)^\alpha}, $$ 
+<br />
+
+where $\sigma_n$ is the square root of the average squared Euclidean distance between each utterance x-vector and the mean x-vector of speaker $n$, and the weight $\alpha$ is set to 0.1 in this paper. High x-vector diversity of a speaker results in low speaker similarity scores. </p>
+
+<h2 id="dc3-dc2--utterance-wise-divergence-regularization"><strong>DC3</strong>: DC2 + Utterance-wise divergence regularization</h2>
+<p align="justify"> To regularize the x-vector of an utterance should be similar to the x-vectors of other utterances of the same speaker, an utterance-wise regularizer is introduced to the denominator of DC2, and the new <b>DC3</b> criterion is formulated as 
+<br />
+$$\frac{\mathrm{PLDA}'(\boldsymbol{x}_{n, i},\boldsymbol{x}_{Target})}{(\sigma_n ||\boldsymbol{x}_{n, i}-\boldsymbol{u}_{n}||_{2})^\alpha}, $$
+<br />
+where $||{\cdot}||_{2}$ denotes the Euclidean distance (L2 norm), and $\boldsymbol{u}_{n}$ is the mean x-vector of speaker $n$. The larger the Euclidean distance, the lower the speaker similarity score. </p>
+
+<h2 id="demo-sounds"><strong>Demo Sounds</strong></h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left"> </th>
+      <th style="text-align: center">Female</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Natural</td>
+      <td style="text-align: center"><audio src="res/audio/F1/Natural/T1S3000097.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">SI<sup> *1</sup></td>
+      <td style="text-align: center"><audio src="res/audio/F1/SI/T1S3000097_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Adapt90<sup> *2</sup></td>
+      <td style="text-align: center"><audio src="res/audio/F1/Adapt90/T1S3000097_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Adapt5<sup> *3</sup></td>
+      <td style="text-align: center"><audio src="res/audio/F1/Adapt5/T1S3000097_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">DC1<sup> *4</sup></td>
+      <td style="text-align: center"><audio src="res/audio/F1/DC1/T1S3000097_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">DC2<sup> *5</sup></td>
+      <td style="text-align: center"><audio src="res/audio/F1/DC2/T1S3000097_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">DC3<sup> *6</sup></td>
+      <td style="text-align: center"><audio src="res/audio/F1/DC3/T1S3000097_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><sup>*1. <code class="highlighter-rouge">SI: Speaker-independent baseline</code> </sup><br />
+<sup>*2. <code class="highlighter-rouge">Adapt90: Adaptation w/ 90 target utts </code> </sup><br />
+<sup>*3. <code class="highlighter-rouge">Adapt5: Adaptation w/ 5 target utts</code> </sup> <br />
+<sup>*4. <code class="highlighter-rouge">DC1: Adaptation w/ 5 target utts + 85 DC1 selected utts</code> </sup><br />
+<sup>*5. <code class="highlighter-rouge">DC2: Adaptation w/ 5 target utts + 85 DC2 selected utts</code> </sup><br />
+<sup>*6. <code class="highlighter-rouge">DC3: Adaptation w/ 5 target utts + 85 DC3 selected utts</code> </sup></p>
+
+<p><br /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left"> </th>
+      <th style="text-align: center">Male 1</th>
+      <th style="text-align: center">Male 2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Natural</td>
+      <td style="text-align: center"><audio src="res/audio/M1/Natural/T1S4000099.wav" controls="" preload=""></audio></td>
+      <td style="text-align: center"><audio src="res/audio/M2/Natural/T1S5000095.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">SI</td>
+      <td style="text-align: center"><audio src="res/audio/M1/SI/T1S4000099_gen.wav" controls="" preload=""></audio></td>
+      <td style="text-align: center"><audio src="res/audio/M2/SI/T1S5000095_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Adapt90</td>
+      <td style="text-align: center"><audio src="res/audio/M1/Adapt90/T1S4000099_gen.wav" controls="" preload=""></audio></td>
+      <td style="text-align: center"><audio src="res/audio/M2/Adapt90/T1S5000095_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Adapt5</td>
+      <td style="text-align: center"><audio src="res/audio/M1/Adapt5/T1S4000099_gen.wav" controls="" preload=""></audio></td>
+      <td style="text-align: center"><audio src="res/audio/M2/Adapt5/T1S5000095_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">DC1</td>
+      <td style="text-align: center"><audio src="res/audio/M1/DC1/T1S4000099_gen.wav" controls="" preload=""></audio></td>
+      <td style="text-align: center"><audio src="res/audio/M2/DC1/T1S5000095_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">DC2</td>
+      <td style="text-align: center"><audio src="res/audio/M1/DC2/T1S4000099_gen.wav" controls="" preload=""></audio></td>
+      <td style="text-align: center"><audio src="res/audio/M2/DC2/T1S5000095_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">DC3</td>
+      <td style="text-align: center"><audio src="res/audio/M1/DC3/T1S4000099_gen.wav" controls="" preload=""></audio></td>
+      <td style="text-align: center"><audio src="res/audio/M2/DC3/T1S5000095_gen.wav" controls="" preload=""></audio></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<h2 id="experimental-results"><strong>Experimental Results</strong></h2>
+<ul>
+  <li>Objective evaluation</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left"> </th>
+      <th style="text-align: center">SI</th>
+      <th style="text-align: center">Adapt90</th>
+      <th style="text-align: center">Adapt5</th>
+      <th style="text-align: center">DC1</th>
+      <th style="text-align: center">DC2</th>
+      <th style="text-align: center">DC3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">LSD (dB)</td>
+      <td style="text-align: center">1.07</td>
+      <td style="text-align: center"><strong>1.00</strong></td>
+      <td style="text-align: center">1.08</td>
+      <td style="text-align: center">1.09</td>
+      <td style="text-align: center">1.08</td>
+      <td style="text-align: center">1.04</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">MCD (dB)</td>
+      <td style="text-align: center">6.36</td>
+      <td style="text-align: center"><strong>5.43</strong></td>
+      <td style="text-align: center">5.96</td>
+      <td style="text-align: center">6.06</td>
+      <td style="text-align: center">6.03</td>
+      <td style="text-align: center">6.08</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">$F_0$ (Hz)</td>
+      <td style="text-align: center">70.8</td>
+      <td style="text-align: center"><strong>67.3</strong></td>
+      <td style="text-align: center">69.5</td>
+      <td style="text-align: center">68.2</td>
+      <td style="text-align: center">67.9</td>
+      <td style="text-align: center">70.0</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">$U/V$ (%)</td>
+      <td style="text-align: center">15.6</td>
+      <td style="text-align: center"><strong>13.7</strong></td>
+      <td style="text-align: center">14.9</td>
+      <td style="text-align: center">15.1</td>
+      <td style="text-align: center">14.9</td>
+      <td style="text-align: center">14.7</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">PLDA</td>
+      <td style="text-align: center">33.2</td>
+      <td style="text-align: center"><strong>39.5</strong></td>
+      <td style="text-align: center">29.0</td>
+      <td style="text-align: center">34.8</td>
+      <td style="text-align: center">32.6</td>
+      <td style="text-align: center">33.6</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">CosSim</td>
+      <td style="text-align: center">0.82</td>
+      <td style="text-align: center"><strong>0.88</strong></td>
+      <td style="text-align: center">0.81</td>
+      <td style="text-align: center">0.84</td>
+      <td style="text-align: center">0.84</td>
+      <td style="text-align: center">0.84</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<ul>
+  <li>Subjective evaluation (MOS)</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left"> </th>
+      <th style="text-align: center">Natural</th>
+      <th style="text-align: center">SI</th>
+      <th style="text-align: center">Adapt90</th>
+      <th style="text-align: center">Adapt5</th>
+      <th style="text-align: center">DC3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Quality</td>
+      <td style="text-align: center">4.96$\pm$.03</td>
+      <td style="text-align: center">3.47$\pm$.14</td>
+      <td style="text-align: center"><strong>3.71</strong>$\pm$.13</td>
+      <td style="text-align: center">2.65$\pm$.14</td>
+      <td style="text-align: center">3.29$\pm$.13</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Similarity</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">3.57$\pm$.16</td>
+      <td style="text-align: center"><strong>4.23</strong>$\pm$.14</td>
+      <td style="text-align: center">3.43$\pm$.16</td>
+      <td style="text-align: center">3.71$\pm$.15</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<h2 id="plda-score-distributions-of-candidate-utterances"><strong>PLDA score distributions of candidate utterances</strong></h2>
+<center><img src="res/figure/Gender.png" style="display:block;width:500px;height:350px" /></center>
+<p align="justify"> The score distributions for the female and the first male targets show the PLDA scores reflect the high correlation between gender and speaker similarity as expected. The selection thresholds of different utterance numbers imply the challenge to optimize the selection numbers because of the rapid PLDA score decrease for the increased selected utterances. </p>
+
+<p><br /> 
+<a href="https://bigpon.github.io/">Home</a></p>
+
+<p><br /><br />
+<br /></p>
+
+      </div>
+    </div>
+
+    <p style="font-size: 60%; text-align: right;">page layout is modified from <a href="https://github.com/jasonlong/cayman-theme">cayman-theme</a> and <a href="https://github.com/adueck/cayman-blog">cayman-blog</a>. <a href="http://creativecommons.org/licenses/by/4.0/">LICENSE</a></p>
+
+
+
+  </body>
+
+    <script src="https://cdn.jsdelivr.net/clipboard.js/1.5.12/clipboard.min.js"></script>
+
+<script>
+var clipboard = new Clipboard('.share-btn');
+
+    clipboard.on('success', function(e) {
+        console.log(e);
+    });
+    clipboard.on('error', function(e) {
+        console.log(e);
+    });
+</script>
+
+
+</html>
