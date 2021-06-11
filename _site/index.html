@@ -47,10 +47,10 @@
 </script>
 
 <p>This page is the demo of 
-“Relational Data Selection for Data Augmentation of Speaker-dependent Multi-band MelGAN Vocoder” [<a href="https://arxiv.org/abs/2007.12955">paper</a>]</p>
+“Relational Data Selection for Data Augmentation of Speaker-dependent Multi-band MelGAN Vocoder” [<a href="https://arxiv.org/abs/2106.12955">paper</a>], which is a cooperation work by <a href="https://www.toda.is.i.nagoya-u.ac.jp/index.html">Toda Lab</a> @ Nagoya University, Japan and <a href="http://slam.iis.sinica.edu.tw/">SLAM lab</a> @ Academia Sinica, Taiwan.</p>
 
 <h2 id="abstract"><strong>Abstract</strong></h2>
-<p align="justify"> In this paper, we propose a data augmentation method based on speaker representation and similarity measurement of speaker verification. The proposed method (<b>DC1-3</b>) selects utterances that have similar speaker identity to the target speaker from an external corpus, and then combines the selected utterances with the limited target data for speaker-dependent (SD) vocoder adaptation. Compared with the vocoder adapted using only limited target data, the vocoder adapted using augmented data improves both the quality and similarity of synthesized speech. </p>
+<p align="justify"> In this paper, we propose a data augmentation method based on speaker representation and similarity measurement of speaker verification. The proposed method adopts specific criteria (<b>DC1-3</b>) to select utterances that have similar speaker identity to the target speaker from an external corpus, and then combines the selected utterances with the limited target data for speaker-dependent (SD) vocoder adaptation. Compared with the vocoder adapted using only limited target data, the vocoder adapted using augmented data improves both the quality and similarity of synthesized speech. </p>
 
 <p><strong>Corpus and references:</strong><br />
 <a href="http://challenge.ai.iqiyi.com/detail?raceId=5fb2687724954e0b48431fdf">M2VoC in ICASSP2021</a><br />
@@ -296,7 +296,7 @@ where $||{\cdot}||_{2}$ denotes the Euclidean distance (L2 norm), and $\boldsymb
 <p><br /></p>
 
 <h2 id="plda-score-distributions-of-candidate-utterances"><strong>PLDA score distributions of candidate utterances</strong></h2>
-<center><img src="res/figure/Gender.png" style="display:block;width:500px;height:350px" /></center>
+<center><img src="res/figure/Gender.svg" style="display:block;width:600px;height:450px" /></center>
 <p align="justify"> The score distributions for the female and the first male targets show the PLDA scores reflect the high correlation between gender and speaker similarity as expected. The selection thresholds of different utterance numbers imply the challenge to optimize the selection numbers because of the rapid PLDA score decrease for the increased selected utterances. </p>
 
 <p><br /> 
